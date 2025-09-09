@@ -4,6 +4,8 @@ import AuthLayout from '../../components/layout/AuthLayout';
 import LogsTable from '../../components/projects/LogsTable';
 import EditProjectModal from '../../components/projects/EditProjectModal';
 import DownloadClientButton from '../../components/projects/DownloadClientButton';
+import api from '@/services/apiService';
+import toast from 'react-hot-toast';
 
 // Dados de exemplo para logs
 interface Log {
@@ -105,6 +107,25 @@ setProject(projectFromQuery);
   //   });
   // };
 
+  const handleEditProject = async (projectData: { name: string; description: string }) => {
+    if (!project) return;
+  
+    try {
+      // Chamada para o backend
+      await api.put(`/projects/${project.id}`, projectData);
+  
+      // Atualiza apenas o projeto selecionado
+      setProject({ ...project, ...projectData });
+  
+      toast.success("Projeto atualizado com sucesso!");
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Erro ao atualizar projeto:", error);
+      toast.error("Não foi possível atualizar o projeto.");
+    }
+  };
+  
+
   if (!project) {
     return (
       <AuthLayout username={mockUser.username}>
@@ -148,14 +169,7 @@ setProject(projectFromQuery);
 
       {project && (
         <EditProjectModal
-          onSubmit={(projectData) => {
-            // Implement project update logic here
-            setProject({
-              ...project,
-              name: projectData.name,
-              description: projectData.description
-            });
-          }}
+          onSubmit={handleEditProject}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           // onSubmit={handleUpdateProject}

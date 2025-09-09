@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import FormInput from '../ui/FormInput';
 import { Button } from '../ui/Button';
+import axios from 'axios';
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -71,20 +72,22 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
     
     setIsSubmitting(true);
     
     try {
-      // Simulação de envio para API
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await axios.post('http://localhost:3000/api/v1/users', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        company: formData.company
+      });
       
-      // Simulação de sucesso
+      console.log('Usuário criado:', response.data);
+  
       setSubmitSuccess(true);
-      
-      // Limpar formulário
+  
       setFormData({
         name: '',
         email: '',
@@ -92,15 +95,18 @@ export default function RegisterForm() {
         confirmPassword: '',
         company: '',
       });
-    } catch (error) {
-      console.error('Erro ao enviar formulário:', error);
+    } catch (error: any) {
+      console.error('Erro ao criar usuário:', error);
+      
+      // Mensagem de erro genérica ou detalhada do backend
       setErrors({
-        form: 'Ocorreu um erro ao processar seu cadastro. Tente novamente.'
+        form: error.response?.data?.message || 'Ocorreu um erro ao processar seu cadastro.'
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   if (submitSuccess) {
     return (

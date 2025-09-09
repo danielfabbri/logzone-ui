@@ -4,6 +4,9 @@ import ProjectCard from '../../components/projects/ProjectCard';
 import NewProjectModal from '../../components/projects/NewProjectModal';
 import { getProjects } from '../../services/projectService';
 import api from '../../services/apiService';
+import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/router';
 
 interface Project {
   id: string;
@@ -16,16 +19,19 @@ interface Project {
 console.log("Página de projetos")
 
 export default function ProjectsPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
   useEffect(() => {
+    if (!user) router.push('/login');
   console.log("useEffect disparou");
-  getProjects().then((data) => {
+  getProjects().then((data: { data: Project[] }) => {
     console.log("Projetos vindos da API:", data);
     // Mapear _id para id
-    const mappedProjects = data.data.map((p: any) => ({
-      id: p._id,
+    const mappedProjects = data.data.map((p: Project) => ({
+      id: p.id,
       name: p.name,
       description: p.description,
       logsCount: p.logsCount ?? 0,
@@ -37,21 +43,27 @@ export default function ProjectsPage() {
 
   const handleCreateProject = async (projectData: { name: string; description: string }) => {
     try {
-      const response = await api.post('/projects', projectData);
-      const newProject: Project = response.data;
-      setProjects((prev) => [...prev, newProject]);
+      await api.post('/projects', projectData);
+      const data = await getProjects(); // pega a lista atualizada do backend
+      const mappedProjects = (data.data as Project[]).map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        logsCount: p.logsCount ?? 0,
+        createdAt: p.createdAt,
+      }));
+      setProjects(mappedProjects);
       setIsNewProjectModalOpen(false);
+      toast.success("Projeto criado com sucesso!");
     } catch (error) {
       console.error('Erro ao criar projeto:', error);
     }
   };
 
-  const mockUser = {
-    username: 'João Silva'
-  };
-
+  if (!user) return null; 
+  
   return (
-    <AuthLayout username={mockUser.username}>
+    <AuthLayout username={user.name}>
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Meus Projetos</h1>
         <button
