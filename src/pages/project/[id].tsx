@@ -5,31 +5,6 @@ import LogsTable from '../../components/projects/LogsTable';
 import EditProjectModal from '../../components/projects/EditProjectModal';
 import DownloadClientButton from '../../components/projects/DownloadClientButton';
 
-// Dados de exemplo para projetos
-const MOCK_PROJECTS = [
-  {
-    id: '1',
-    name: 'E-commerce App',
-    description: 'Sistema de e-commerce com logs de transações e erros',
-    apiKey: 'lz_1a2b3c4d5e6f7g8h9i0j',
-    createdAt: '2023-05-15T10:30:00Z'
-  },
-  {
-    id: '2',
-    name: 'Blog CMS',
-    description: 'Sistema de gerenciamento de conteúdo para blog',
-    apiKey: 'lz_2b3c4d5e6f7g8h9i0j1k',
-    createdAt: '2023-06-22T14:45:00Z'
-  },
-  {
-    id: '3',
-    name: 'API Gateway',
-    description: 'Gateway de API para microserviços',
-    apiKey: 'lz_3c4d5e6f7g8h9i0j1k2l',
-    createdAt: '2023-04-10T09:15:00Z'
-  }
-];
-
 // Dados de exemplo para logs
 interface Log {
   id: string;
@@ -68,8 +43,8 @@ const MOCK_LOGS: Log[] = [
 ] as const; // ou Log[]
 
 export default function ProjectPage() {
-  const router = useRouter();
-  const { id } = router.query;
+const router = useRouter();
+const { id, name, description, logsCount, createdAt } = router.query;
   
   interface Project {
   id: string;
@@ -91,23 +66,35 @@ const [logs, setLogs] = useState<Log[]>([]);
   };
 
   useEffect(() => {
-    if (id && typeof id === 'string') {
-      const foundProject = MOCK_PROJECTS.find(project => project.id === id);
-      if (foundProject) {
-        setProject(foundProject);
+  if (!router.isReady) return;
+  const { id, name, description, logsCount, createdAt } = router.query;
+  if (!id || !name || !description || !logsCount || !createdAt) return;
+  const logsCountNumber = Array.isArray(logsCount) ? parseInt(logsCount[0]) : parseInt(logsCount);
+  const projectFromQuery = {
+  id: Array.isArray(id) ? id[0] : id,
+  name: Array.isArray(name) ? name[0] : name,
+  description: Array.isArray(description) ? description[0] : description,
+  createdAt: Array.isArray(createdAt) ? createdAt[0] : createdAt,
+  logsCount: logsCountNumber,
+  apiKey: 'default_api_key', // valor padrão
+};
 
-        const projectLogs = MOCK_LOGS.filter(log => log.projectId === id)
-        .map(log => ({
-          ...log,
-          level: log.level as 'info' | 'warning' | 'error'
-        }));
+setProject(projectFromQuery);
 
-      setLogs(projectLogs);
-      } else {
-        router.push('/projects');
-      }
-    }
-  }, [id, router]);
+  // Se quiser, você pode criar logs fake com base no logsCount
+  const projectLogs = Array.from({ length: logsCountNumber }, (_, i) => ({
+    id: `${i + 1}`,
+    projectId: projectFromQuery.id,
+    timestamp: new Date().toISOString(),
+    level: 'info' as const,
+    message: `Log ${i + 1} do projeto`,
+    source: 'from-query',
+  }));
+
+  setLogs(projectLogs);
+
+}, [router.isReady, router.query]);
+
 
   // const handleUpdateProject = (projectData) => {
   //   // Simulando atualização do projeto

@@ -1,5 +1,5 @@
 import MainLayout from '../../components/layout/MainLayout';
-import LoginForm from '../../components/login/LoginForm';
+import LoginForm from '@/components/login/LoginForm';
 
 export default function Login() {
 
