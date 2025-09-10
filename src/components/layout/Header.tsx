@@ -10,6 +10,9 @@ export default function Header() {
         <Link href="/" className="font-medium hover:text-blue-600 dark:hover:text-blue-400">
           Home
         </Link>
+        <Link href="/documentation" className="font-medium hover:text-blue-600 dark:hover:text-blue-400">
+          Documentation
+        </Link>
         <Link href="/register" className="font-medium hover:text-blue-600 dark:hover:text-blue-400">
           Registrar
         </Link>
