@@ -6,6 +6,7 @@ import EditProjectModal from '../../components/projects/EditProjectModal';
 import DownloadClientButton from '../../components/projects/DownloadClientButton';
 import api from '@/services/apiService';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Dados de exemplo para logs
 interface Log {
@@ -17,38 +18,7 @@ interface Log {
   source: string;
 }
 
-const MOCK_LOGS: Log[] = [
-  {
-    id: '1',
-    projectId: '1',
-    timestamp: '2023-07-10T14:30:00Z',
-    level: 'info',
-    message: 'Usuário realizou login com sucesso',
-    source: 'auth-service'
-  },
-  {
-    id: '2',
-    projectId: '2',
-    timestamp: '2023-07-10T14:35:00Z',
-    level: 'warning',
-    message: 'Tentativa de acesso a recurso não autorizado',
-    source: 'api-gateway'
-  },
-  {
-    id: '3',
-    projectId: '3',
-    timestamp: '2023-07-10T14:40:00Z',
-    level: 'error',
-    message: 'Falha na conexão com o banco de dados',
-    source: 'db-service'
-  }
-] as const; // ou Log[]
-
-export default function ProjectPage() {
-const router = useRouter();
-const { id, name, description, logsCount, createdAt } = router.query;
-  
-  interface Project {
+interface Project {
   id: string;
   name: string;
   description: string;
@@ -56,46 +26,46 @@ const { id, name, description, logsCount, createdAt } = router.query;
   createdAt: string;
 }
 
-const [project, setProject] = useState<Project | null>(null);
 
 
-const [logs, setLogs] = useState<Log[]>([]);
+
+export default function ProjectPage() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const { id } = router.query;
+
+  const [project, setProject] = useState<Project | null>(null);
+  const [logs, setLogs] = useState<Log[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+    
+    
   
-  // Usuário mockado
-  const mockUser = {
-    username: 'João Silva'
-  };
+ 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-  if (!router.isReady) return;
-  const { id, name, description, logsCount, createdAt } = router.query;
-  if (!id || !name || !description || !logsCount || !createdAt) return;
-  const logsCountNumber = Array.isArray(logsCount) ? parseInt(logsCount[0]) : parseInt(logsCount);
-  const projectFromQuery = {
-  id: Array.isArray(id) ? id[0] : id,
-  name: Array.isArray(name) ? name[0] : name,
-  description: Array.isArray(description) ? description[0] : description,
-  createdAt: Array.isArray(createdAt) ? createdAt[0] : createdAt,
-  logsCount: logsCountNumber,
-  apiKey: 'default_api_key', // valor padrão
-};
-
-setProject(projectFromQuery);
-
-  // Se quiser, você pode criar logs fake com base no logsCount
-  const projectLogs = Array.from({ length: logsCountNumber }, (_, i) => ({
-    id: `${i + 1}`,
-    projectId: projectFromQuery.id,
-    timestamp: new Date().toISOString(),
-    level: 'info' as const,
-    message: `Log ${i + 1} do projeto`,
-    source: 'from-query',
-  }));
-
-  setLogs(projectLogs);
-
-}, [router.isReady, router.query]);
+    if (!user) return;
+    if (!router.isReady) return;
+    if (!id) return;
+  
+    console.log("chegou aqui, chamando API com id:", id);
+  
+    api.get(`/projects/${id}`)
+      .then(res => {
+        console.log("Resposta da API:", res.data);
+        setProject(res.data.data); // <- aqui o ajuste
+        setLogs(res.data.data.logs || []);
+      })
+      .catch(err => {
+        console.error("Erro ao buscar projeto:", err);
+        toast.error("Não foi possível carregar o projeto.");
+      });
+  }, [router.isReady, id, user]);
+  
+  
 
 
   // const handleUpdateProject = (projectData) => {
@@ -126,18 +96,19 @@ setProject(projectFromQuery);
   };
   
 
-  if (!project) {
+  if (!mounted || !user || !project) {
     return (
-      <AuthLayout username={mockUser.username}>
+      <AuthLayout username={user?.name || ''}>
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       </AuthLayout>
     );
   }
+  
 
   return (
-    <AuthLayout username={mockUser.username}>
+    <AuthLayout username={user.name}>
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
         <div className="flex justify-between items-start mb-4">
           <div>

@@ -25,28 +25,28 @@ export default function ProjectsPage() {
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) router.push('/login');
-  console.log("useEffect disparou");
-  getProjects().then((data: { data: Project[] }) => {
-    console.log("Projetos vindos da API:", data);
-    // Mapear _id para id
-    const mappedProjects = data.data.map((p: Project) => ({
-      id: p.id,
-      name: p.name,
-      description: p.description,
-      logsCount: p.logsCount ?? 0,
-      createdAt: p.createdAt,
-    }));
-    setProjects(mappedProjects);
-  });
-}, []);
+    if (!user) return; // só continua se user existir
+    console.log("useEffect disparou");
+  
+    getProjects().then((data: { data: any[] }) => {
+      console.log("Projetos vindos da API:", data);
+      const mappedProjects = data.data.map(p => ({
+        id: p._id,
+        name: p.name,
+        description: p.description,
+        logsCount: p.logsCount ?? 0,
+        createdAt: p.createdAt,
+      }));
+      setProjects(mappedProjects);
+    });
+  }, [user]);
 
   const handleCreateProject = async (projectData: { name: string; description: string }) => {
     try {
       await api.post('/projects', projectData);
       const data = await getProjects(); // pega a lista atualizada do backend
-      const mappedProjects = (data.data as Project[]).map(p => ({
-        id: p.id,
+      const mappedProjects = (data.data as any[]).map(p => ({
+        id: p._id, // e aqui
         name: p.name,
         description: p.description,
         logsCount: p.logsCount ?? 0,
@@ -61,7 +61,7 @@ export default function ProjectsPage() {
   };
 
   if (!user) return null; 
-  
+
   return (
     <AuthLayout username={user.name}>
       <div className="mb-6 flex justify-between items-center">

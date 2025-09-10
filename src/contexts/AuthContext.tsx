@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async (jwt: string) => {
     try {
-      const res = await axios.get('http://localhost:5000/api/v1/auth/me', {
+      const res = await axios.get('http://localhost:3000/api/v1/auth/me', {
         headers: { Authorization: `Bearer ${jwt}` }
       });
       setUser(res.data.user);

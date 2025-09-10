@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface EditProjectModalProps {
   isOpen: boolean;
@@ -24,8 +25,8 @@ export default function EditProjectModal({ isOpen, onClose, onSubmit, project }:
   };
 
   const copyApiKey = () => {
-    navigator.clipboard.writeText(project.apiKey);
-    alert('API Key copiada para a área de transferência!');
+    navigator.clipboard.writeText(project.apiKey);    
+    toast.success('API Key copiada para a área de transferência!');
   };
 
   if (!isOpen) return null;
