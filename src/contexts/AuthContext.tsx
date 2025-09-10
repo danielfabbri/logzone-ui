@@ -8,6 +8,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  company?: string;
 }
 
 interface AuthContextType {
@@ -15,6 +16,7 @@ interface AuthContextType {
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (email: string, password: string, company: string) => Promise<void>;
 }
 
 export const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
@@ -64,8 +66,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
+  const updateUser = async (email: string, password: string, company: string) => {
+    if (!token) return;
+
+    try {
+      const response = await axios.put('http://localhost:3000/api/v1/auth/me', {
+        email,
+        password,
+        company
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setUser(response.data.user);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

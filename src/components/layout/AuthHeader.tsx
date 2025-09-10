@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/router';
 
 interface AuthHeaderProps {
   username: string;
@@ -9,6 +10,7 @@ interface AuthHeaderProps {
 export default function AuthHeader({ username }: AuthHeaderProps) {
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -43,6 +45,15 @@ export default function AuthHeader({ username }: AuthHeaderProps) {
 
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 rounded-md shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-800">
+                <button 
+                  onClick={() => {
+                    router.push('/account');
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  Perfil
+                </button>
                 <button
                   onClick={() => {
                     logout();
