@@ -1,8 +1,10 @@
+// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
-  // Configuração para usar apenas o Pages Router
-  reactStrictMode: true
+  images: {
+    unoptimized: true, // permite usar next/image no next export
+  },
+  output: 'export', // garante que o build vai gerar estáticos
 };
 
 module.exports = nextConfig;

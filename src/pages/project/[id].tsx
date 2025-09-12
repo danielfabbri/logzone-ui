@@ -98,7 +98,7 @@ export default function ProjectPage() {
 
   if (!mounted || !user || !project) {
     return (
-      <AuthLayout username={user?.name || ''}>
+      <AuthLayout >
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
@@ -108,7 +108,7 @@ export default function ProjectPage() {
   
 
   return (
-    <AuthLayout username={user.name}>
+    <AuthLayout >
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -119,7 +119,7 @@ export default function ProjectPage() {
             </p>
           </div>
           <div className="flex gap-3">
-            <DownloadClientButton projectId={project.id} apiKey={project.apiKey} />
+            <DownloadClientButton />
             <button
               onClick={() => setIsEditModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"

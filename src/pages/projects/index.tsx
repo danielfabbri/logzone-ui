@@ -6,7 +6,7 @@ import { getProjects } from '../../services/projectService';
 import api from '../../services/apiService';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/router';
+
 
 interface Project {
   id: string;
@@ -20,50 +20,61 @@ console.log("Página de projetos")
 
 export default function ProjectsPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
+  interface ProjectFromAPI {
+    _id: string;
+    name: string;
+    description: string;
+    logsCount?: number;
+    createdAt: string;
+  }
+
   useEffect(() => {
-    if (!user) return; // só continua se user existir
-    console.log("useEffect disparou");
-  
-    getProjects().then((data: { data: any[] }) => {
-      console.log("Projetos vindos da API:", data);
-      const mappedProjects = data.data.map(p => ({
-        id: p._id,
-        name: p.name,
-        description: p.description,
-        logsCount: p.logsCount ?? 0,
-        createdAt: p.createdAt,
-      }));
+  if (!user) return; // só continua se user existir
+  console.log("useEffect disparou");
+
+  getProjects().then((data: { data: ProjectFromAPI[] }) => {
+    console.log("Projetos vindos da API:", data);
+
+    const mappedProjects = data.data.map(p => ({
+      id: p._id,
+      name: p.name,
+      description: p.description,
+      logsCount: p.logsCount ?? 0,
+      createdAt: p.createdAt,
+    }));
+
       setProjects(mappedProjects);
     });
   }, [user]);
 
   const handleCreateProject = async (projectData: { name: string; description: string }) => {
-    try {
-      await api.post('/projects', projectData);
-      const data = await getProjects(); // pega a lista atualizada do backend
-      const mappedProjects = (data.data as any[]).map(p => ({
-        id: p._id, // e aqui
-        name: p.name,
-        description: p.description,
-        logsCount: p.logsCount ?? 0,
-        createdAt: p.createdAt,
-      }));
-      setProjects(mappedProjects);
-      setIsNewProjectModalOpen(false);
-      toast.success("Projeto criado com sucesso!");
-    } catch (error) {
-      console.error('Erro ao criar projeto:', error);
-    }
-  };
+  try {
+    await api.post('/projects', projectData);
+    const data = await getProjects(); // pega a lista atualizada do backend
+
+    const mappedProjects = (data.data as ProjectFromAPI[]).map(p => ({
+      id: p._id,
+      name: p.name,
+      description: p.description,
+      logsCount: p.logsCount ?? 0,
+      createdAt: p.createdAt,
+    }));
+
+    setProjects(mappedProjects);
+    setIsNewProjectModalOpen(false);
+    toast.success("Projeto criado com sucesso!");
+  } catch (error) {
+    console.error('Erro ao criar projeto:', error);
+  }
+};
 
   if (!user) return null; 
 
   return (
-    <AuthLayout username={user.name}>
+    <AuthLayout >
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Meus Projetos</h1>
         <button

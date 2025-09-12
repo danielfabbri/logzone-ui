@@ -100,7 +100,7 @@ main();`}
                   <td className="px-4 py-2">level</td>
                   <td className="px-4 py-2">string</td>
                   <td className="px-4 py-2">✅</td>
-                  <td className="px-4 py-2">Log level: 'info', 'warn', 'error', etc.</td>
+                  <td className="px-4 py-2">Log level: info, warn, error, etc.</td>
                 </tr>
                 <tr>
                   <td className="px-4 py-2">message</td>

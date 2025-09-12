@@ -24,7 +24,7 @@ export default function AccountPage() {
     setLoading(true);
     try {
       // Chama a API para atualizar usuário
-      const response = await api.put(`/users/${user?.id}`, {
+      await api.put(`/users/${user?.id}`, {
         name,
         email,
         company,
@@ -37,9 +37,11 @@ export default function AccountPage() {
       if (updateUser) updateUser(email, password, company);
 
       setPassword(""); // limpa o campo senha
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err?.response?.data?.message || "Erro ao atualizar perfil");
+    } catch (err: unknown) {
+       // Aqui substituímos o `any` por `unknown`
+      const error = err as { response?: { data?: { message?: string } } };
+      console.error(error);
+      toast.error(error.response?.data?.message || "Erro ao atualizar perfil");
     } finally {
       setLoading(false);
     }
@@ -48,7 +50,7 @@ export default function AccountPage() {
   if (!user) return null; // evita renderizar sem usuário
 
   return (
-    <AuthLayout username={user.name}>
+    <AuthLayout >
       <div className="max-w-md mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-4">Editar Perfil</h1>
 

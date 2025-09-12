@@ -3,11 +3,9 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 
-interface AuthHeaderProps {
-  username: string;
-}
 
-export default function AuthHeader({ username }: AuthHeaderProps) {
+
+export default function AuthHeader() {
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();

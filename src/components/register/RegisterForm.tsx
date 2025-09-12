@@ -95,13 +95,20 @@ export default function RegisterForm() {
         confirmPassword: '',
         company: '',
       });
-    } catch (error: any) {
-      console.error('Erro ao criar usuário:', error);
-      
-      // Mensagem de erro genérica ou detalhada do backend
-      setErrors({
-        form: error.response?.data?.message || 'Ocorreu um erro ao processar seu cadastro.'
-      });
+    } catch (error: unknown) {
+       let message = 'Ocorreu um erro ao processar seu cadastro.';
+
+        if (axios.isAxiosError(error)) {
+          // Se for erro do Axios
+          message = error.response?.data?.message || message;
+        } else if (error instanceof Error) {
+          // Qualquer outro erro JS
+          message = error.message;
+        }
+
+        console.error('Erro ao criar usuário:', message);
+
+        setErrors({ form: message });
     } finally {
       setIsSubmitting(false);
     }

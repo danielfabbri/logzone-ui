@@ -23,7 +23,7 @@ describe('AuthLayout', () => {
 
   it('renderiza o AuthHeader, Footer e children', () => {
     render(
-      <AuthLayout username="Wendell">
+      <AuthLayout >
         <div>Conteúdo teste</div>
       </AuthLayout>
     );

@@ -1,11 +1,8 @@
 import React from 'react';
 
-interface DownloadClientButtonProps {
-  projectId: string;
-  apiKey: string;
-}
 
-export default function DownloadClientButton({ projectId, apiKey }: DownloadClientButtonProps) {
+
+export default function DownloadClientButton() {
   const handleDownload = () => {
     // Aqui seria gerado o conteúdo do arquivo logzone.js com a API key e o ID do projeto
     const fileContent = `// Hello World`;

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import AuthHeader from '@/components/Layout/AuthHeader';
+import AuthHeader from '@/components/layout/AuthHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
 

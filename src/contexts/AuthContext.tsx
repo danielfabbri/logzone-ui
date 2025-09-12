@@ -1,6 +1,6 @@
 // src/contexts/AuthContext.tsx
 'use client';
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import React from 'react';
 
@@ -31,26 +31,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     const [token, setToken] = useState<string | null>(null);
 
-  // Carrega token do localStorage ao iniciar
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  }, []);
+
+
+  const fetchUser = useCallback(async (jwt: string) => {
+  try {
+    const res = await axios.get('http://localhost:3000/api/v1/auth/me', {
+      headers: { Authorization: `Bearer ${jwt}` }
+    });
+    setUser(res.data.user);
+    } catch (err) {
+      console.error(err);
+      logout();
+    }
+  }, [logout]); // 
+
+    // Carrega token do localStorage ao iniciar
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
       fetchUser(storedToken);
     }
-  }, []);
-
-  const fetchUser = async (jwt: string) => {
-    try {
-      const res = await axios.get('http://localhost:3000/api/v1/auth/me', {
-        headers: { Authorization: `Bearer ${jwt}` }
-      });
-      setUser(res.data.user);
-    } catch (err) {
-      console.error(err);
-      logout();
-    }
-  };
+  }, [fetchUser]);
 
   const login = async (email: string, password: string) => {
     const response = await axios.post('http://localhost:3000/api/v1/auth/login', { email, password });
@@ -60,11 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(user);
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
+  
 
   const updateUser = async (email: string, password: string, company: string) => {
     if (!token) return;

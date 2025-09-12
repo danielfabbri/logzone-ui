@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LoginForm from '@/components/login/LoginForm';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/router';
-import toast from 'react-hot-toast';
+
 
 // Mock do toast
 jest.mock('react-hot-toast', () => ({
