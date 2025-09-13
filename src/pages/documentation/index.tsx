@@ -10,7 +10,7 @@ export default function Documentation() {
 
         {/* Intro */}
         <p className="text-lg text-gray-700">
-          ***
+          **
           The <strong>Logzone SDK</strong> allows you to send structured logs
           from your Node.js projects to the Leadzone platform. Log errors, warnings, info messages, and include additional context.
         </p>

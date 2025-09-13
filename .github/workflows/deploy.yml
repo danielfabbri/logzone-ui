@@ -16,8 +16,8 @@ jobs:
       - name: Instalar dependências
         run: npm install
 
-      - name: Build do projeto
-        run: npm run build:export
+      - name: Build Next.js app
+        run: npm run build
 
       - name: Deploy para S3
         uses: jakejarvis/s3-sync-action@master

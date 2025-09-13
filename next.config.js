@@ -1,10 +1,10 @@
 // next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   images: {
-    unoptimized: true, // permite usar next/image no next export
+    unoptimized: true, // necessário para deploy em S3/CloudFront
   },
-  output: 'export', // garante que o build vai gerar estáticos
 };
 
 module.exports = nextConfig;
